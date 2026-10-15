@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>People Desk · HR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --mist: #f2f6f7;
+      --surface: #ffffff;
+      --ink: #14262e;
+      --ink-soft: #52656d;
+      --line: #d8e2e6;
+      --teal: #0f6b6b;
+      --teal-deep: #0b2a30;
+      --teal-tint: #dcefef;
+      --amber: #e5a43b;
+      --danger: #a43a2c;
+      --danger-tint: #fbeae7;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+      --font-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--mist);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    :focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+    /* ---------- Shell ---------- */
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    .topbar {
+      background: var(--teal-deep);
+      color: #b9cdd1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 28px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; color: #fff; }
+
+    .brand-mark {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      background: var(--teal);
+      display: grid; place-items: center;
+      flex: none;
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.01em;
+    }
+
+    .topbar-note { font-size: 0.9rem; }
+
+    .tabs { display: none; }
+
+    .workspace {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 20px;
+      padding: 20px 28px 28px;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      gap: 14px;
+    }
+
+    .col-head h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
+    .col-head p { margin: 4px 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+    .panel {
+      flex: 1;
+      min-height: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ---------- Chat ---------- */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .msg {
+      max-width: 86%;
+      padding: 11px 15px;
+      border-radius: 16px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .msg.bot { align-self: flex-start; background: var(--mist); border: 1px solid var(--line); border-bottom-left-radius: 5px; }
+    .msg.user { align-self: flex-end; background: var(--teal); color: #fff; border-bottom-right-radius: 5px; }
+    .msg.error { align-self: flex-start; background: var(--danger-tint); border: 1px solid #efc4bd; color: var(--danger); border-bottom-left-radius: 5px; }
+
+    .welcome { display: flex; flex-direction: column; gap: 14px; margin: auto 0; }
+    .welcome h2 { margin: 0; font-family: var(--font-display); font-size: 1.35rem; letter-spacing: -0.015em; }
+    .welcome p { margin: 0; color: var(--ink-soft); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .chip {
+      font: inherit;
+      font-size: 0.9rem;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .chip:hover { border-color: var(--teal); background: var(--teal-tint); }
+
+    .typing {
+      align-self: flex-start;
+      display: flex; gap: 5px;
+      padding: 15px 16px;
+      background: var(--mist);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      border-bottom-left-radius: 5px;
+    }
+    .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-soft); animation: pulse 1.2s infinite ease-in-out; }
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-3px); }
+    }
+
+    .composer {
+      display: flex; align-items: flex-end; gap: 10px;
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .composer textarea {
+      flex: 1;
+      font: inherit;
+      color: var(--ink);
+      resize: none;
+      max-height: 140px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: var(--mist);
+      line-height: 1.4;
+    }
+    .composer textarea::placeholder { color: #81939a; }
+    .composer textarea:focus { outline: none; border-color: var(--teal); background: #fff; box-shadow: 0 0 0 3px var(--teal-tint); }
+
+    .btn {
+      font: inherit;
+      font-weight: 600;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      border: 0;
+      background: var(--teal);
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #0c5858; }
+    .btn:disabled { background: #9db7b7; cursor: not-allowed; }
+
+    .btn-quiet {
+      background: transparent;
+      color: var(--teal);
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      font-size: 0.875rem;
+    }
+    .btn-quiet:hover { background: var(--teal-tint); }
+
+    /* ---------- Form side ---------- */
+    .panel-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 0.875rem;
+    }
+
+    .form-frame { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
+
+    /* ---------- Smaller screens: one side at a time ---------- */
+    @media (max-width: 900px) {
+      .topbar { padding: 12px 16px; }
+      .topbar-note { display: none; }
+
+      .tabs {
+        display: flex;
+        gap: 6px;
+        padding: 10px 14px 0;
+      }
+
+      .tab {
+        flex: 1;
+        font: inherit;
+        font-weight: 600;
+        padding: 10px 12px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink-soft);
+        cursor: pointer;
+      }
+      .tab[aria-selected="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+      .workspace { grid-template-columns: 1fr; padding: 14px; }
+      .col { display: none; }
+      .col.active { display: flex; }
+      .col-head h1 { font-size: 1.35rem; }
+      .messages { padding: 16px 14px; }
+      .msg { max-width: 92%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M17 14.2c2.5.2 4.5 2.2 4.5 4.8"/></svg>
+        </span>
+        <span class="brand-name">People Desk</span>
+      </div>
+      <span class="topbar-note">Ask a question, then submit your leave request.</span>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-chat" aria-selected="true" aria-controls="col-chat" type="button">Ask HR</button>
+      <button class="tab" role="tab" id="tab-leave" aria-selected="false" aria-controls="col-leave" type="button">Leave request</button>
+    </div>
+
+    <main class="workspace">
+      <!-- Left: chatbot -->
+      <section class="col active" id="col-chat" aria-labelledby="chat-title">
+        <div class="col-head">
+          <h1 id="chat-title">Ask HR</h1>
+          <p>Get quick answers about policies, benefits, and time off.</p>
+        </div>
+
+        <div class="panel">
+          <div class="messages" id="messages" role="log" aria-live="polite">
+            <div class="welcome" id="welcome">
+              <h2>How can we help today?</h2>
+              <p>Type a question below or start with one of these.</p>
+              <div class="chips">
+                <button class="chip" type="button">How do I request leave?</button>
+                <button class="chip" type="button">What is the sick leave policy?</button>
+                <button class="chip" type="button">How many vacation days do I get?</button>
+                <button class="chip" type="button">Who do I contact about payroll?</button>
+              </div>
+            </div>
+          </div>
+
+          <form class="composer" id="composer" autocomplete="off">
+            <label for="input" style="position:absolute;left:-9999px">Your message</label>
+            <textarea id="input" rows="1" placeholder="Ask a question about HR" required></textarea>
+            <button class="btn" id="send" type="submit">
+              Send
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4z"/></svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right: Google Form -->
+      <section class="col" id="col-leave" aria-labelledby="leave-title">
+        <div class="col-head">
+          <h1 id="leave-title">Leave request</h1>
+          <p>Fill in the form to request time off.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-bar">
+            <span>Form not loading?</span>
+            <a class="btn btn-quiet" href="https://docs.google.com/forms/d/e/1FAIpQLSf7YGuw9Yccj-KuYgt6nR-cXpOopaVzlfIjKCMt6T5nXYhcJA/viewform" target="_blank" rel="noopener">Open in new tab</a>
+          </div>
+          <iframe class="form-frame" title="Leave request form"
+            src="https://docs.google.com/forms/d/e/1FAIpQLSf7YGuw9Yccj-KuYgt6nR-cXpOopaVzlfIjKCMt6T5nXYhcJA/viewform?embedded=true">
+            Loading…
+          </iframe>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // While testing, n8n only listens on the "-test" URL after you click
+    // "Listen for test event" in the workflow. For real use, activate the workflow
+    // and switch to the production URL: .../webhook/chatbot
+    const WEBHOOK_URL = "https://tasnem17.app.n8n.cloud/webhook-test/chatbot";
+
+    const messagesEl = document.getElementById("messages");
+    const welcomeEl = document.getElementById("welcome");
+    const form = document.getElementById("composer");
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
+
+    let sessionId = "";
+    try {
+      sessionId = localStorage.getItem("hr-session") || "";
+      if (!sessionId) {
+        sessionId = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()) + Math.random().toString(16).slice(2);
+        localStorage.setItem("hr-session", sessionId);
+      }
+    } catch (e) {
+      sessionId = String(Date.now());
+    }
+
+    function addMessage(text, kind) {
+      if (welcomeEl && welcomeEl.parentNode) welcomeEl.remove();
+      const el = document.createElement("div");
+      el.className = "msg " + kind;
+      el.textContent = text;
+      messagesEl.appendChild(el);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return el;
+    }
+
+    function showTyping() {
+      const el = document.createElement("div");
+      el.className = "typing";
+      el.setAttribute("aria-label", "The assistant is typing");
+      el.innerHTML = "<span></span><span></span><span></span>";
+      messagesEl.appendChild(el);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return el;
+    }
+
+    function extractReply(data) {
+      if (typeof data === "string") return data;
+      if (Array.isArray(data)) return extractReply(data[0]);
+      if (data && typeof data === "object") {
+        const keys = ["output", "text", "message", "response", "reply", "answer"];
+        for (const k of keys) {
+          if (typeof data[k] === "string" && data[k].trim()) return data[k];
+        }
+        if (data.json) return extractReply(data.json);
+      }
+      return "";
+    }
+
+    async function send(text) {
+      addMessage(text, "user");
+      input.value = "";
+      autosize();
+      sendBtn.disabled = true;
+      const typing = showTyping();
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "sendMessage",
+            sessionId: sessionId,
+            chatInput: text,
+            message: text
+          })
+        });
+
+        const raw = await res.text();
+        if (!res.ok) throw new Error("status " + res.status);
+
+        let data = raw;
+        try { data = JSON.parse(raw); } catch (e) { /* plain text reply */ }
+
+        const reply = extractReply(data);
+        typing.remove();
+        if (reply) {
+          addMessage(reply, "bot");
+        } else {
+          addMessage("The assistant replied, but the answer was empty. Check that your n8n workflow ends with a Respond to Webhook node returning an \"output\" field.", "error");
+        }
+      } catch (err) {
+        typing.remove();
+        addMessage("We couldn't reach the assistant. If you're testing, click \"Listen for test event\" in n8n and send your message again. Otherwise, check that the workflow is active and the webhook allows requests from this site (CORS).", "error");
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    function autosize() {
+      input.style.height = "auto";
+      input.style.height = Math.min(input.scrollHeight, 140) + "px";
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (text && !sendBtn.disabled) send(text);
+    });
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+    input.addEventListener("input", autosize);
+
+    document.querySelectorAll(".chip").forEach(function (chip) {
+      chip.addEventListener("click", function () { send(chip.textContent); });
+    });
+
+    // Tabs (only visible on narrow screens)
+    const tabs = { chat: document.getElementById("tab-chat"), leave: document.getElementById("tab-leave") };
+    const cols = { chat: document.getElementById("col-chat"), leave: document.getElementById("col-leave") };
+    function showTab(name) {
+      Object.keys(tabs).forEach(function (k) {
+        tabs[k].setAttribute("aria-selected", String(k === name));
+        cols[k].classList.toggle("active", k === name);
+      });
+    }
+    tabs.chat.addEventListener("click", function () { showTab("chat"); });
+    tabs.leave.addEventListener("click", function () { showTab("leave"); });
+  </script>
+</body>
+</html>

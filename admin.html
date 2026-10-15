@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Settings · People Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M17 14.2c2.5.2 4.5 2.2 4.5 4.8"/></svg>
+      </span>
+      <span class="brand-name" id="site-name">People Desk</span>
+    </a>
+    <a class="topbar-link" href="index.html">Back to the site</a>
+  </header>
+
+  <main class="admin">
+    <div>
+      <h1>Settings</h1>
+      <p class="lede">Change the endpoint, form link, text, and colors in one place.</p>
+    </div>
+
+    <section class="card" aria-labelledby="h-conn">
+      <h2 id="h-conn">Connections</h2>
+
+      <div class="field">
+        <label for="webhookUrl">Chatbot webhook URL</label>
+        <input type="url" id="webhookUrl" placeholder="https://your-name.app.n8n.cloud/webhook/chatbot">
+        <span class="hint">The n8n webhook that answers chat messages.</span>
+        <div class="note" id="webhook-mode" hidden></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-quiet" type="button" id="test-webhook">Send a test message</button>
+      </div>
+      <div class="note" id="test-result" hidden></div>
+
+      <div class="field">
+        <label for="formUrl">Leave request form link</label>
+        <input type="url" id="formUrl" placeholder="https://docs.google.com/forms/d/e/.../viewform">
+        <span class="hint">The normal Google Form link. Embedding is added for you.</span>
+        <div class="note bad" id="form-warning" hidden>This doesn't look like a Google Forms link, so it may not load inside the page.</div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-text">
+      <h2 id="h-text">Text</h2>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="siteName">Site name</label>
+          <input type="text" id="siteName">
+        </div>
+        <div class="field">
+          <label for="topbarNote">Top bar message</label>
+          <input type="text" id="topbarNote">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="chatTitle">Chat title</label>
+          <input type="text" id="chatTitle">
+        </div>
+        <div class="field">
+          <label for="chatSubtitle">Chat description</label>
+          <input type="text" id="chatSubtitle">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="welcomeTitle">Welcome heading</label>
+          <input type="text" id="welcomeTitle">
+        </div>
+        <div class="field">
+          <label for="welcomeText">Welcome message</label>
+          <input type="text" id="welcomeText">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="placeholder">Message box placeholder</label>
+        <input type="text" id="placeholder">
+      </div>
+
+      <div class="field">
+        <label for="suggestions">Suggested questions</label>
+        <textarea id="suggestions"></textarea>
+        <span class="hint">One question per line. Leave empty to hide them.</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="leaveTitle">Form title</label>
+          <input type="text" id="leaveTitle">
+        </div>
+        <div class="field">
+          <label for="leaveSubtitle">Form description</label>
+          <input type="text" id="leaveSubtitle">
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-color">
+      <h2 id="h-color">Colors</h2>
+      <div class="grid-3">
+        <div class="field">
+          <label for="primary">Main color</label>
+          <input type="color" id="primary">
+        </div>
+        <div class="field">
+          <label for="dark">Top bar</label>
+          <input type="color" id="dark">
+        </div>
+        <div class="field">
+          <label for="background">Page background</label>
+          <input type="color" id="background">
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-save">
+      <h2 id="h-save">Save your changes</h2>
+      <ol class="steps">
+        <li>Choose <strong>Preview on the site</strong> to see the result in this browser.</li>
+        <li>Happy with it? Choose <strong>Download config.js</strong>.</li>
+        <li>Replace <code>config.js</code> in your GitHub repo with the downloaded file and commit it. The live site updates after GitHub finishes publishing.</li>
+      </ol>
+
+      <div class="actions">
+        <button class="btn" type="button" id="preview">Preview on the site</button>
+        <button class="btn" type="button" id="download">Download config.js</button>
+        <button class="btn btn-quiet" type="button" id="copy">Copy config.js text</button>
+        <button class="btn btn-quiet" type="button" id="reset">Reset to config.js</button>
+      </div>
+      <div class="note" id="save-result" hidden></div>
+    </section>
+  </main>
+
+  <script>
+    const OVERRIDE_KEY = "hr-config-override";
+    const $ = function (id) { return document.getElementById(id); };
+
+    function merge(base, extra) {
+      if (Array.isArray(extra) || typeof extra !== "object" || extra === null) return extra;
+      const out = Object.assign({}, base);
+      Object.keys(extra).forEach(function (k) {
+        out[k] = (base && typeof base[k] === "object" && !Array.isArray(base[k]))
+          ? merge(base[k], extra[k]) : extra[k];
+      });
+      return out;
+    }
+
+    // Start from config.js, then any preview saved in this browser.
+    let cfg = window.SITE_CONFIG || {};
+    try {
+      const saved = JSON.parse(localStorage.getItem(OVERRIDE_KEY) || "null");
+      if (saved) cfg = merge(cfg, saved);
+    } catch (e) {}
+
+    const theme = cfg.theme || {};
+    const chat = cfg.chat || {};
+    const leave = cfg.leave || {};
+
+    // Apply the saved theme to this page too
+    const rootStyle = document.documentElement.style;
+    if (theme.primary) rootStyle.setProperty("--teal", theme.primary);
+    if (theme.dark) rootStyle.setProperty("--teal-deep", theme.dark);
+    if (theme.background) rootStyle.setProperty("--mist", theme.background);
+    $("site-name").textContent = cfg.siteName || "People Desk";
+
+    // ---------- Fill the form ----------
+    $("webhookUrl").value = chat.webhookUrl || "";
+    $("formUrl").value = leave.formUrl || "";
+    $("siteName").value = cfg.siteName || "";
+    $("topbarNote").value = cfg.topbarNote || "";
+    $("chatTitle").value = chat.title || "";
+    $("chatSubtitle").value = chat.subtitle || "";
+    $("welcomeTitle").value = chat.welcomeTitle || "";
+    $("welcomeText").value = chat.welcomeText || "";
+    $("placeholder").value = chat.placeholder || "";
+    $("suggestions").value = (chat.suggestions || []).join("\n");
+    $("leaveTitle").value = leave.title || "";
+    $("leaveSubtitle").value = leave.subtitle || "";
+    $("primary").value = theme.primary || "#0f6b6b";
+    $("dark").value = theme.dark || "#0b2a30";
+    $("background").value = theme.background || "#f2f6f7";
+
+    // ---------- Read the form back into a config object ----------
+    function collect() {
+      return {
+        siteName: $("siteName").value.trim(),
+        topbarNote: $("topbarNote").value.trim(),
+        theme: {
+          primary: $("primary").value,
+          dark: $("dark").value,
+          background: $("background").value
+        },
+        chat: {
+          title: $("chatTitle").value.trim(),
+          subtitle: $("chatSubtitle").value.trim(),
+          webhookUrl: $("webhookUrl").value.trim(),
+          welcomeTitle: $("welcomeTitle").value.trim(),
+          welcomeText: $("welcomeText").value.trim(),
+          placeholder: $("placeholder").value.trim(),
+          suggestions: $("suggestions").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean)
+        },
+        leave: {
+          title: $("leaveTitle").value.trim(),
+          subtitle: $("leaveSubtitle").value.trim(),
+          formUrl: $("formUrl").value.trim()
+        }
+      };
+    }
+
+    function configText(c) {
+      return "// People Desk settings.\n" +
+        "// Edit this file directly, or use admin.html to change the values and download a fresh copy.\n" +
+        "// After changing it, commit and push so the live site picks it up.\n\n" +
+        "window.SITE_CONFIG = " + JSON.stringify(c, null, 2) + ";\n";
+    }
+
+    function show(el, text, kind) {
+      el.hidden = false;
+      el.className = "note" + (kind ? " " + kind : "");
+      el.textContent = text;
+    }
+
+    function validate(c) {
+      if (!/^https:\/\//i.test(c.chat.webhookUrl)) {
+        return "The webhook URL should start with https://";
+      }
+      if (c.leave.formUrl && !/^https:\/\//i.test(c.leave.formUrl)) {
+        return "The form link should start with https://";
+      }
+      return "";
+    }
+
+    // ---------- Live hints ----------
+    function updateHints() {
+      const w = $("webhookUrl").value;
+      const modeEl = $("webhook-mode");
+      if (/\/webhook-test\//.test(w)) {
+        show(modeEl, "This is the test URL. It only answers after you click \"Listen for test event\" in n8n. Switch to the /webhook/ URL before sharing the site.");
+      } else {
+        modeEl.hidden = true;
+      }
+
+      const f = $("formUrl").value.trim();
+      $("form-warning").hidden = !f || /^https:\/\/(docs\.google\.com\/forms|forms\.gle)\//i.test(f);
+    }
+    $("webhookUrl").addEventListener("input", updateHints);
+    $("formUrl").addEventListener("input", updateHints);
+    updateHints();
+
+    // ---------- Test the webhook ----------
+    $("test-webhook").addEventListener("click", async function () {
+      const url = $("webhookUrl").value.trim();
+      const out = $("test-result");
+      if (!/^https:\/\//i.test(url)) { show(out, "Enter a webhook URL that starts with https:// first.", "bad"); return; }
+
+      const btn = $("test-webhook");
+      btn.disabled = true;
+      show(out, "Sending a test message…");
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "sendMessage",
+            sessionId: "settings-test",
+            chatInput: "Hello, this is a test message.",
+            message: "Hello, this is a test message."
+          })
+        });
+        const raw = await res.text();
+        if (!res.ok) {
+          show(out, "n8n answered with status " + res.status + ". If you're using the test URL, click \"Listen for test event\" in n8n and try again.", "bad");
+        } else {
+          let preview = raw;
+          try {
+            const d = JSON.parse(raw);
+            const first = Array.isArray(d) ? d[0] : d;
+            preview = (first && (first.output || first.text || first.message || first.response)) || raw;
+          } catch (e) {}
+          show(out, "Connected. Reply: " + String(preview).slice(0, 240), "ok");
+        }
+      } catch (e) {
+        show(out, "Couldn't reach the webhook. Check the URL, make sure the workflow is active (or listening), and that the Webhook node allows requests from this site (CORS).", "bad");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---------- Save actions ----------
+    $("preview").addEventListener("click", function () {
+      const c = collect();
+      const problem = validate(c);
+      if (problem) { show($("save-result"), problem, "bad"); return; }
+      try {
+        localStorage.setItem(OVERRIDE_KEY, JSON.stringify(c));
+        location.href = "index.html";
+      } catch (e) {
+        show($("save-result"), "This browser blocked saving the preview. You can still download config.js.", "bad");
+      }
+    });
+
+    $("download").addEventListener("click", function () {
+      const c = collect();
+      const problem = validate(c);
+      if (problem) { show($("save-result"), problem, "bad"); return; }
+      const blob = new Blob([configText(c)], { type: "text/javascript" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "config.js";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+      show($("save-result"), "Downloaded. Replace config.js in your repo with this file and commit it.", "ok");
+    });
+
+    $("copy").addEventListener("click", async function () {
+      const c = collect();
+      const problem = validate(c);
+      if (problem) { show($("save-result"), problem, "bad"); return; }
+      try {
+        await navigator.clipboard.writeText(configText(c));
+        show($("save-result"), "Copied. Paste it into config.js in your repo and commit it.", "ok");
+      } catch (e) {
+        show($("save-result"), "Copying was blocked. Use Download config.js instead.", "bad");
+      }
+    });
+
+    $("reset").addEventListener("click", function () {
+      try { localStorage.removeItem(OVERRIDE_KEY); } catch (e) {}
+      location.reload();
+    });
+  </script>
+</body>
+</html>
